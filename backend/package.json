@@ -4,16 +4,19 @@
   "type": "module",
   "devDependencies": {
     "@types/bun": "latest",
+    "@types/cors": "^2.8.17",
     "prisma": "5.16.1"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
   },
   "dependencies": {
+    "@clerk/clerk-sdk-node": "^5.0.14",
     "@prisma/client": "5.16.1",
     "@types/cookie-parser": "^1.4.7",
     "@types/express": "^4.17.21",
     "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
     "express": "^4.19.2"
   }
 }
