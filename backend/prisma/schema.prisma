@@ -13,27 +13,29 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+//this model represents an admin user who can create multiple EmailBlasts 
 model AdminUser {
-  id      String  @id @default(cuid())
-  clerkId String
-  email   String  @unique
-  name    String?
+  id        String   @id @default(cuid())
+  clerkId   String
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
 
   //relationships
-  createdAt  DateTime     @default(now())
-  EmailBlast EmailBlast[]
+  EmailBlast EmailBlast[] //one Admin user can create multiple email blasts
 }
 
+//this model represents a mailing list that can contain multiple recipients and be targeted by multiple email blasts
 model MailingList {
   id        String   @id @default(cuid())
   name      String
   createdAt DateTime @default(now())
 
-  //relationships
-  Recipient  Recipient[]
-  EmailBlast EmailBlast[]
+  Recipients  RecipientToMailingList[]
+  EmailBlasts EmailBlastToMailingList[]
 }
 
+//this model reps a message sent to a recipient, and can also be part of an email blast 
 model Message {
   id          String   @id @default(cuid())
   content     String
@@ -41,31 +43,56 @@ model Message {
   sentTime    DateTime
 
   //relationships
-  Recipient    Recipient[]
+  recipientId  String
+  Recipient    Recipient   @relation(fields: [recipientId], references: [id]) //Many-to-one relationship with Recipient
   emailBlastId String?
-  EmailBlast   EmailBlast? @relation(fields: [emailBlastId], references: [id])
+  EmailBlast   EmailBlast? @relation(fields: [emailBlastId], references: [id]) // Many-to-one relationship with EmailBlast (optional)
 }
 
+// This model represents a recipient who can be part of multiple mailing lists and receive multiple messages
 model Recipient {
   id    String @id @default(cuid())
   name  String
   email String
 
   //relationships
-  lists            MailingList @relation(fields: [mailingListId], references: [id])
-  mailingListId    String
-  receivedMessages Message     @relation(fields: [messageId], references: [id])
-  messageId        String
+  MailingLists RecipientToMailingList[] // Many-to-many relationship with MailingLists
+  Messages     Message[] // One-to-many relationship with Messages
+  // lists            MailingList[] @relation(fields: [mailingListId], references: [id])
+  // mailingListId    String
+  // receivedMessages Message[]     @relation(fields: [messageId], references: [id])
+  // messageId        String
 }
 
+// This model represents an email blast created by an admin user, targeting multiple mailing lists and containing multiple messages
 model EmailBlast {
-  id   String @id @default(cuid())
-  name String
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
 
   //relationships
-  author        AdminUser   @relation(fields: [adminUserId], references: [id])
-  adminUserId   String
-  targetList    MailingList @relation(fields: [mailingListId], references: [id])
+  author       AdminUser                 @relation(fields: [adminUserId], references: [id]) // Many-to-one relationship with AdminUser
+  adminUserId  String
+  TargetLists  EmailBlastToMailingList[] // Many-to-many relationship with MailingLists
+  messagesSent Message[] // One-to-many relationship with Messages
+}
+
+// This join table connects Recipients and MailingLists, allowing a many-to-many relationship between them
+model RecipientToMailingList {
+  recipient     Recipient   @relation(fields: [recipientId], references: [id])
+  recipientId   String
+  mailingList   MailingList @relation(fields: [mailingListId], references: [id], onDelete: Cascade)
   mailingListId String
-  messagesSent  Message[]
+
+  @@id([recipientId, mailingListId])
+}
+
+// This join table connects EmailBlasts and MailingLists, allowing a many-to-many relationship between them
+model EmailBlastToMailingList {
+  emailBlast    EmailBlast  @relation(fields: [emailBlastId], references: [id])
+  emailBlastId  String
+  mailingList   MailingList @relation(fields: [mailingListId], references: [id])
+  mailingListId String
+
+  @@id([emailBlastId, mailingListId])
 }
