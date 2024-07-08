@@ -1,4 +1,6 @@
 import './App.css';
+import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/clerk-react";
+
 
 function App() {
 
@@ -12,6 +14,12 @@ function App() {
           Email Composition and Sending
         </ul>
       </div>
+      <SignedOut>
+        <SignInButton />
+      </SignedOut>
+      <SignedIn>
+        <UserButton />
+      </SignedIn>
     </>
   );
 }

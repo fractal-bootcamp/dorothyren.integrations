@@ -13,26 +13,59 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model AdminUser {
+  id      String  @id @default(cuid())
+  clerkId String
+  email   String  @unique
+  name    String?
 
-  posts Post[]
-
-  @@map("users")
+  //relationships
+  createdAt  DateTime     @default(now())
+  EmailBlast EmailBlast[]
 }
 
-model Post {
+model MailingList {
   id        String   @id @default(cuid())
-  title     String
-  content   String
-  author    User     @relation(fields: [authorId], references: [id])
-  authorId  String
+  name      String
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
-  @@map("posts")
+  //relationships
+  Recipient  Recipient[]
+  EmailBlast EmailBlast[]
+}
+
+model Message {
+  id          String   @id @default(cuid())
+  content     String
+  isDelivered Boolean
+  sentTime    DateTime
+
+  //relationships
+  Recipient    Recipient[]
+  emailBlastId String?
+  EmailBlast   EmailBlast? @relation(fields: [emailBlastId], references: [id])
+}
+
+model Recipient {
+  id    String @id @default(cuid())
+  name  String
+  email String
+
+  //relationships
+  lists            MailingList @relation(fields: [mailingListId], references: [id])
+  mailingListId    String
+  receivedMessages Message     @relation(fields: [messageId], references: [id])
+  messageId        String
+}
+
+model EmailBlast {
+  id   String @id @default(cuid())
+  name String
+
+  //relationships
+  author        AdminUser   @relation(fields: [adminUserId], references: [id])
+  adminUserId   String
+  targetList    MailingList @relation(fields: [mailingListId], references: [id])
+  mailingListId String
+  messagesSent  Message[]
 }
