@@ -32,7 +32,7 @@ const optionalUser: RequestHandler = async (req, res, next) => {
     //if there is a Clerk user ID
     if (clerkId) {
         //look up the user in the database using prisma 
-        const user = await prisma.users.findFirst({
+        const user = await prisma.adminUser.findFirst({
             where: {
                 clerkId //Match the Clerk user ID
             }
@@ -56,7 +56,7 @@ const optionalUser: RequestHandler = async (req, res, next) => {
             const email = clerkUser.emailAddresses[0].emailAddress;
             // create a new user in the database with the Clerk user ID and email
             //extracted from above
-            const newUser = await prisma.users.create({
+            const newUser = await prisma.adminUser.create({
                 data: {
                     clerkId,
                     email
