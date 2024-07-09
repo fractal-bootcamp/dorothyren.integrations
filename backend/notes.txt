@@ -1,0 +1,16 @@
+how to organize routes: 
+router patterns
+
+function+F2 to rename
+
+all express does is build the app. 
+
+middleware is a function - route handler that passes on a response to the next handler. 
+
+##router is like a middleware that routes. 
+- listRouter
+- recipientRouter 
+etc. 
+
+
+

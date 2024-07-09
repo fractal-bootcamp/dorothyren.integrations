@@ -1,0 +1,37 @@
+in src - create a folder called services
+- 1 - in services create a listservice.ts 
+- 2. also create a config.ts
+- 3. utils.ts  
+
+- in config.ts, create a const for the base url, export it
+
+- in utils.ts make a config.ts and makerequest.ts
+makerequest.ts 
+type options - RequestInit & CustomOptions
+
+const getToken = () => "sup"
+
+const makeRequest = (input: string, options?:RequestInit) => {
+    const token = getToken();
+    return feth(baseurl + path, {
+         ...options, //specify the options so you can specify headers
+        headers: {
+            'Content-Type': 'application/json',
+            ...options?.headers,
+        },
+    });
+}
+
+
+
+const Service = {
+    async getLists() {  
+    }
+}
+
+
+Look into: 
+look into axios
+what are options? we just define options and mostly the default request options - body, headers, method. 
+
+
