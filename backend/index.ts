@@ -2,12 +2,20 @@ import { ClerkExpressWithAuth } from '@clerk/clerk-sdk-node';
 import cookieParser from 'cookie-parser';
 import express from 'express';
 import prisma from './utils/client';
+
 import cors from 'cors';
+
+// import dotenv from 'dotenv';
+// dotenv.config();
 
 const app = express();
 
 // using middleware 
-app.use(cors())
+app.use(cors({
+    origin: 'http://localhost:5173',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+}))
 app.use(express.json())
 // allow urlencoded data to be submitted using middleware
 app.use(express.urlencoded({ extended: true }))
@@ -17,25 +25,7 @@ app.use(cookieParser())
 // this takes the token and communicates with clerk to get user information
 // which gets assigned to req.auth
 app.use(ClerkExpressWithAuth())
-app.use(express.urlencoded({extended: true}))
-app.use(cookieParser())
 
-
-//FOR THE DASHBOARD PAGE, create GET response to get all blasts
-app.get('/blast/all', async (req, res) => {
-    try{
-        const feed = await prisma.emailBlast.findMany({
-            orderBy: {
-                createdAt: 'desc' //returns the most recent first 
-            },
-        })
-        res.json(feed);
-    }
-    catch (error) {
-        console.error('Error fetching art feed', error);
-        res.status(500).json({ error: 'An error occurred while fetching the email blast feed' });
-    }
-})
 
 //FOR THE MAILING LIST PAGE
 
@@ -133,6 +123,21 @@ app.post('/blast/new', (req, res) => {
 
 })
 
+//create route to GET all email blasts
+app.get('/blast/all', async (req, res) => {
+    try{
+        const emailBlasts = await prisma.emailBlast.findMany({
+            orderBy: {
+                createdAt: 'desc' //returns the most recent first 
+            },
+        })
+        res.json(emailBlasts);
+    }
+    catch (error) {
+        console.error('Error fetching email blasts', error);
+        res.status(500).json({ error: 'An error occurred while fetching the email blasts' });
+    }
+})
 
 app.listen(3000, () => {
   console.log('Server is running on port 3000, http://localhost:3000');

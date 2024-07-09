@@ -1,8 +1,8 @@
-import client from "../utils/client";
+import prisma from "../utils/client";
 
 async function main() {
     // Seed adminUser
-    const adminUser = await client.adminUser.create({
+    const adminUser = await prisma.adminUser.create({
         data: {
             clerkId: "clerk123",
             email: "admin@example.com",
@@ -11,7 +11,7 @@ async function main() {
     });
 
     // Seed emailBlast
-    const emailBlast = await client.emailBlast.create({
+    const emailBlast = await prisma.emailBlast.create({
         data: {
             name: "Welcome to our service!",
             body: "This is the first email blast.",
@@ -21,7 +21,7 @@ async function main() {
     });
 
     // Seed mailingList
-    const mailingList = await client.mailingList.create({
+    const mailingList = await prisma.mailingList.create({
         data: {
             name: "Main List",
             createdAt: new Date()
@@ -29,14 +29,14 @@ async function main() {
     });
 
     // Seed recipients
-    const recipient1 = await client.recipient.create({
+    const recipient1 = await prisma.recipient.create({
         data: {
             email: "user@example.com",
             name: "John Doe"
         },
     });
 
-    const recipient2 = await client.recipient.create({
+    const recipient2 = await prisma.recipient.create({
         data: {
             email: "user2@example.com",
             name: "Jane Smith"
@@ -44,7 +44,7 @@ async function main() {
     });
 
     // Seed recipientToMailingList
-    await client.recipientToMailingList.createMany({
+    await prisma.recipientToMailingList.createMany({
         data: [{
             recipientId: recipient1.id,
             mailingListId: mailingList.id
@@ -56,7 +56,7 @@ async function main() {
     });
 
      // Seed emailBlastToMailingList
-    await client.emailBlastToMailingList.create({
+    await prisma.emailBlastToMailingList.create({
         data: {
             emailBlastId: emailBlast.id,
             mailingListId: mailingList.id
@@ -72,5 +72,5 @@ main()
         process.exit(1);
     })
     .finally(async () => {
-        await client.$disconnect();
+        await prisma.$disconnect();
     });
