@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom";
 
+//we will import some EmailComposition component here. 
+
 //this page is used to compose and send emails to select lists
 //maybe incorporate rich text markdown editor to construct emails 
 
