@@ -40,3 +40,33 @@ export async function getAllEmailBlasts() {
             }
         }
     }
+
+export async function createEmailBlast(name: string, body: string, adminUserId: string, token: string) : Promise<EmailBlast> {
+    try {
+        const response = await fetch(SERVER_URL + '/blast/new', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                name: name,
+                body: body,
+                adminUserId: adminUserId
+            }),
+        });
+        const result = await response.json();
+        const newEmailBlast = emailBlastSchema.parse(result);
+        return newEmailBlast;
+    } catch (error) {
+        if (error instanceof z.ZodError) {
+            console.error("Validation error:", error.errors);
+        } else {
+            console.error("Fetch error:", error.message);
+        }
+        return {error: 'Internal server error'};
+    }
+}
+
+
+

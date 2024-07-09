@@ -3,6 +3,7 @@ import cookieParser from 'cookie-parser';
 import express from 'express';
 import prisma from './utils/client';
 
+import optionalAdminUser from './utils/mw-auth';
 import cors from 'cors';
 
 // import dotenv from 'dotenv';
@@ -10,9 +11,11 @@ import cors from 'cors';
 
 const app = express();
 
+const FRONTEND_URL = 'http://localhost:5174';
+
 // using middleware 
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: FRONTEND_URL,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
 }))
@@ -25,7 +28,30 @@ app.use(cookieParser())
 // this takes the token and communicates with clerk to get user information
 // which gets assigned to req.auth
 app.use(ClerkExpressWithAuth())
+//this is the clerk middleware we wrote for auth
+app.use(optionalAdminUser)
 
+
+//FOR THE SIGN-UP PAGE
+//create a POST to create a new user
+app.post('/sign-up', optionalAdminUser, async (req, res) => {
+    const email = req.user?.email;
+    const clerkId = req.user?.clerkId;
+    //if either email or clerkId is not found, then 
+    if (!email || !clerkId) {
+        return res.status(400).json({error: 'User information is missing'})
+    }
+    try {
+        const newUser = await prisma.adminUser.findFirst({
+            where: {
+                clerkId: clerkId,
+            }
+        });
+        return res.json(newUser);
+    } catch (error) {
+        return res.status(500).json({ error: "Failed to create user" });
+    }
+});
 
 //FOR THE MAILING LIST PAGE
 
@@ -119,8 +145,38 @@ app.put('/mailinglist/:id', async (req, res) => {
 })
 
 //create route to POST an email blast 
-app.post('/blast/new', (req, res) => {
+app.post('/blast/new', async (req, res) => {
+    try{
+        // Ensure the user is authenticated
+        //UNDERSTAND THIS
+        if (!req.user || !req.user.id) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
 
+        // Validate input
+        if (!req.body.name || !req.body.body) {
+            return res.status(400).json({ error: 'Name and body are required' });
+        }
+
+        // Create the email blast
+        const emailBlast = await prisma.emailBlast.create({
+            data: {
+                name: req.body.name,
+                body: req.body.body,
+                createdAt: new Date(),
+                adminUserId: req.user?.id
+            }
+        });
+        // Send successful response
+        res.status(201).json({
+            message: 'Email blast successfullycreated',
+            emailBlast
+        });
+
+    } catch (error) {
+        console.error('Error creating email blast:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
 })
 
 //create route to GET all email blasts
