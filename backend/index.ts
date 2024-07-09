@@ -1,7 +1,7 @@
 import { ClerkExpressWithAuth } from '@clerk/clerk-sdk-node';
 import cookieParser from 'cookie-parser';
 import express from 'express';
-import prisma from './prisma/client';
+import prisma from './utils/client';
 import cors from 'cors';
 
 const app = express();
@@ -90,9 +90,11 @@ app.delete('/mailinglist/:id', async (req, res) => {
     }
 })
 
-//create route to POST a mailing list with recipients 
+//create route to POST a new mailing list
 app.post('/mailinglist', async (req, res) => {
-    try{}
+    try{
+
+    }
     catch (error) {
         console.error('Error creating mailing list', error);
         res.status(500).json({ error: 'An error occurred while creating the mailing list' });
@@ -100,7 +102,29 @@ app.post('/mailinglist', async (req, res) => {
 })
 
 //create route to PUT a mailing list with recipients and remove a list of recipients
-app.put('/mailinglist', async (req, res) => {
+app.put('/mailinglist/:id', async (req, res) => {
+    // body - addedRecipients, removedRecipients
+    const { addedRecipients: addedRecipientIds, removedRecipients: removedRecipientIds } = req.body as { addedRecipients: string[], removedRecipients: string[] };
+
+    // modify the mailing list
+    // add recipients
+    await prisma.recipientToMailingList.createMany({
+        data: addedRecipientIds.map(recipient => ({
+            recipientId: recipient,
+            mailingListId: req.params.id
+        }))
+    })
+
+    // this will delete all records from the recipientToMailingList table where the recipientId matches any ID in the removedRecipientIds array
+    await prisma.recipientToMailingList.deleteMany({
+        where: {
+            recipientId: {
+                in: removedRecipientIds  //the in operator checks if the recipeintId is in the array removedRecipientIds
+            }
+        }
+    })
+
+    return res.status(200).json({ message: 'Mailing list updated successfully' });
 
 })
 

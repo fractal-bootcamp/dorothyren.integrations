@@ -68,6 +68,7 @@ model Recipient {
 model EmailBlast {
   id        String   @id @default(cuid())
   name      String
+  body      String
   createdAt DateTime @default(now())
 
   //relationships
