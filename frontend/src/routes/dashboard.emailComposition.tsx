@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import EmailBlastBuilder from "../components/EmailBlastBuilder";
 
 //we will import some EmailComposition component here. 
 
@@ -12,6 +13,7 @@ export default function EmailComposition() {
             <p>This is a protected page.</p>
 
             <ul>
+                < EmailBlastBuilder />
                 <li><Link to="/dashboard">Dashboard</Link></li>
                 <li><Link to="/">Return to index</Link></li>
             </ul>

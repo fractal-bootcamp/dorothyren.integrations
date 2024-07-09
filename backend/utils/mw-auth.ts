@@ -18,7 +18,7 @@ const prisma = new PrismaClient();
 //the constant OptionalUser is an async function that is of type RequestHandler from the Express framework 
 //this defines the shape of middleware functions to take in 3 parameters, the req, the res, and a next callback function to pass control to the next middleware function 
 
-const optionalUser: RequestHandler = async (req, res, next) => {
+const optionalAdminUser: RequestHandler = async (req, res, next) => {
     // grab the token from the Authorization header
     // the format is ALWAYS `Bearer ${token}`
     const token = req.headers.authorization?.split(' ')[1];
@@ -78,4 +78,4 @@ catch (error) {
     next()
 }
 
-export default optionalUser 
+export default optionalAdminUser 
