@@ -149,7 +149,14 @@ export async function softDeleteMailingList(id: string, token: string) {
 }
 
 // This function adds a new recipient
-export async function addNewRecipient(name: string, email: string, token: string) {
+export type RecipientResponse = {
+    id: string,
+    name: string,
+    email: string,
+    message: string,
+} | {error : string} 
+
+export async function addNewRecipient(name: string, email: string, token: string): Promise<RecipientResponse> {
     try {
         const response = await fetch(SERVER_URL + "/recipient/new", {
             method: 'POST',
