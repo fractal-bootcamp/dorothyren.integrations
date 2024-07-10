@@ -17,3 +17,4 @@ app.use(cookieParser())
 // this takes the token and communicates with clerk to get user information
 // which gets assigned to req.auth
 app.use(ClerkExpressWithAuth())
+

@@ -53,7 +53,33 @@ app.post('/sign-up', optionalAdminUser, async (req, res) => {
     }
 });
 
+
 //FOR THE MAILING LIST PAGE
+
+// Create route for GET endpoint to search for specific mailing list by name
+app.get('/mailinglist/search', async (req, res) => {
+    const  {nameofList}  = req.query; // Get the search query from the URL parameters
+    if (!nameofList || typeof nameofList !== 'string') {
+        return res.status(400).json({ error: 'Name query parameter is required and must be a string' });
+    }
+    try {
+        const mailingLists = await prisma.mailingList.findMany({
+            where: {
+                name: {
+                    contains: nameofList,
+                    mode: 'insensitive' //case-insensitive search
+                }
+            },
+            orderBy: {
+                createdAt: 'desc'
+            },
+        });
+        res.json(mailingLists);
+    } catch (error) {
+        console.error('Error searching for mailing list', error);
+        res.status(500).json({ error: 'An error occurred while searching for the mailing list' });
+    }
+});
 
 //create route to GET all mailing lists
 app.get('/mailinglist/all', async (req, res) => {
@@ -107,9 +133,15 @@ app.delete('/mailinglist/:id', async (req, res) => {
 })
 
 //create route to POST a new mailing list
-app.post('/mailinglist', async (req, res) => {
+app.post('/mailinglist/new', async (req, res) => {
     try{
-
+        const newMailingList = await prisma.mailingList.create({
+            data: {
+                name: req.body.name,
+                createdAt: new Date(),
+            },
+        });
+        res.status(201).json({"message": "Mailing list created successfully", newMailingList});
     }
     catch (error) {
         console.error('Error creating mailing list', error);
@@ -169,7 +201,7 @@ app.post('/blast/new', async (req, res) => {
         });
         // Send successful response
         res.status(201).json({
-            message: 'Email blast successfullycreated',
+            message: 'Email blast successfully created',
             emailBlast
         });
 

@@ -62,9 +62,8 @@ export async function createEmailBlast(name: string, body: string, adminUserId: 
         if (error instanceof z.ZodError) {
             console.error("Validation error:", error.errors);
         } else {
-            console.error("Fetch error:", error.message);
+            console.error("Fetch error:", error);
         }
-        return {error: 'Internal server error'};
     }
 }
 

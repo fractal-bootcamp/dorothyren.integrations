@@ -42,10 +42,10 @@ export default function EmailBlastBuilder() {
     }
 
     return (
-        <div>
-            <h1>Email Blast Builder</h1>
-            <form onSubmit={onFormSubmit}>
-                <div>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
+            <h3>Email Blast Builder</h3>
+            <form onSubmit={onFormSubmit} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <div style={{ marginBottom: '1rem' }}>
                     <label htmlFor="name">Name:</label>
                     <input
                         type="text"
@@ -55,7 +55,7 @@ export default function EmailBlastBuilder() {
                         required
                     />
                 </div>
-                <div>
+                <div style={{ marginBottom: '1rem' }}>
                     <label htmlFor="body">Body:</label>
                     <textarea
                         id="body"
@@ -68,8 +68,4 @@ export default function EmailBlastBuilder() {
             </form>
         </div>
     );
-}
-
-export function EmailBlastDrawer() {
-
 }
