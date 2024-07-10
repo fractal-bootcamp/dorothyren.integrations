@@ -116,22 +116,6 @@ app.get('/mailinglist/:id', async (req, res) => {
     }
 })
 
-//create route to DELETE a mailing list
-app.delete('/mailinglist/:id', async (req, res) => {
-    try{
-        const deletedList = await prisma.mailingList.delete({
-            where: {
-                id: req.params.id
-            },
-        })
-        res.status(200).json({ message: 'Mailing list deleted successfully' , deletedList});
-    }
-    catch (error) {
-        console.error('Error deleting mailing list', error);
-        res.status(500).json({ error: 'An error occurred while deleting the mailing list' });
-    }
-})
-
 //create route to POST a new mailing list
 app.post('/mailinglist/new', async (req, res) => {
     try{
@@ -149,8 +133,27 @@ app.post('/mailinglist/new', async (req, res) => {
     }
 })
 
+//create route to DELETE/PUT a mailing list
+app.put('/mailinglist/:id/delete', async (req, res) => {
+    try{
+        const deletedList = await prisma.mailingList.update({
+            where: {
+                id: req.params.id
+            },
+            data: {
+                isDeleted: new Date() //setting the current time stamp
+            }
+        })
+        res.status(200).json({ message: 'Mailing list deleted' , deletedList});
+    }
+    catch (error) {
+        console.error('Error deleting mailing list', error);
+        res.status(500).json({ error: 'An error occurred while deleting the mailing list' });
+    }
+})
+
 //create route to PUT a mailing list with recipients and remove a list of recipients
-app.put('/mailinglist/:id', async (req, res) => {
+app.put('/mailinglist/:id/update', async (req, res) => {
     // body - addedRecipients, removedRecipients
     const { addedRecipients: addedRecipientIds, removedRecipients: removedRecipientIds } = req.body as { addedRecipients: string[], removedRecipients: string[] };
 
@@ -171,10 +174,25 @@ app.put('/mailinglist/:id', async (req, res) => {
             }
         }
     })
-
     return res.status(200).json({ message: 'Mailing list updated successfully' });
-
 })
+
+//create a route to add recipients
+app.post('/recipient/new', async (req, res) => {
+    try {
+        const newRecipient = await prisma.recipient.create({
+            data: {
+                name: req.body.name,
+                email: req.body.email,
+                // Add any other necessary fields
+            },
+        });
+        res.status(201).json({"message": "Recipient created successfully", newRecipient});
+    } catch (error) {
+        console.error('Error creating recipient', error);
+        res.status(500).json({ error: 'An error occurred while creating the recipient' });
+    }
+});
 
 //create route to POST an email blast 
 app.post('/blast/new', async (req, res) => {

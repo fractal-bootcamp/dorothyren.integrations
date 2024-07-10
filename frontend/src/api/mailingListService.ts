@@ -17,7 +17,7 @@ const MailingListSchema = z.object({
 
 export type MailingList = z.infer<typeof MailingListSchema>;
 
-//this function searches for a specific mailing list by name
+//this function searches for a specific mailing list by name query
 export async function searchMailingLists(nameofList: string, token: string): Promise<MailingList[] | undefined> {
    try { const response = await fetch(SERVER_URL + `/mailinglist/search?nameofList=${nameofList}`, {
         method: 'GET',
@@ -46,7 +46,6 @@ export async function searchMailingLists(nameofList: string, token: string): Pro
     }
 }
 
-    
 //This functions fetches all mailing lists
 export async function getMailingLists() {
     try {
@@ -62,6 +61,35 @@ export async function getMailingLists() {
             console.error("Validation error:", error.errors);
         } else {
             console.error("Fetch error:", error);
+        }
+    }
+}
+
+//this function fetches a specific mailing list by id
+export async function getMailingListById(id: string, token: string): Promise<MailingList | undefined> {
+    try {
+        const response = await fetch(SERVER_URL + `/mailinglist/${id}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+        });
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const result = await response.json();
+        const selectedMailingList = MailingListSchema.parse(result);
+        return selectedMailingList;
+    } catch (error) {
+        if (error instanceof z.ZodError) {
+            console.error("Validation error:", error.errors);
+        } else if (error instanceof Error) {
+            console.error("Fetch error:", error.message);
+            throw error;
+        } else {
+            console.error("Unknown error:", error);
+            throw new Error("An unknown error occurred");
         }
     }
 }
@@ -92,4 +120,63 @@ catch (error) {
         console.error("Fetch error:", error)
     }
 }
+}
+
+// This function deletes a mailing list by id
+export async function softDeleteMailingList(id: string, token: string) {
+    try {
+        const response = await fetch(SERVER_URL + `/mailinglist/${id}/delete`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+        if (!response.ok) {
+            throw new Error(`Failed to delete mailing list. Server responded with status: ${response.status}`);
+        }
+        const result = await response.json();
+        return result;
+    } catch (error) {
+        if (error instanceof Error) {
+            console.error("An error occurred while trying to delete the mailing list:", error.message);
+            throw new Error(`Failed to delete mailing list: ${error.message}`);
+        } else {
+            console.error("An unexpected error occurred:", error);
+            throw new Error("An unexpected error occurred while trying to delete the mailing list");
+        }
+    }
+}
+
+// this function updates a mailing list with adding and removing recipients
+export async function updateMailingList(id: string, token: string, addedRecipients: string[], removedRecipients: string[]) {
+    try {
+        const response = await fetch(SERVER_URL + `/mailinglist/${id}/update`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+                addedRecipients,
+                removedRecipients
+            }),
+        });
+        if (!response.ok) {
+            throw new Error(`Failed to update mailing list. Server responded with status: ${response.status}`);
+        }
+        const result = await response.json();
+        return {
+            addedRecipients: result.addedRecipients,
+            removedRecipients: result.removedRecipients
+        };
+        } catch (error) {
+        if (error instanceof Error) {
+            console.error("An error occurred while trying to update the mailing list:", error.message);
+            throw new Error(`Failed to update mailing list: ${error.message}`);
+        } else {
+            console.error("An unexpected error occurred:", error);
+            throw new Error("An unexpected error occurred while trying to update the mailing list");
+        }
+    }
 }

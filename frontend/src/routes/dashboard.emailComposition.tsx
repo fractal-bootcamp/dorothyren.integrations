@@ -12,8 +12,8 @@ export default function EmailComposition() {
             <div style={{ textAlign: 'center' }}>
                 <h2>Email Composition and Sending</h2>
                 <ul style={{ listStyleType: 'none', padding: 0 }}>
-                    <li style={{ marginBottom: '0.5rem' }}><EmailBlastBuilder /></li>
-                    <li style={{ marginBottom: '0.5rem' }}><Link to="/dashboard">Dashboard</Link></li>
+                    <li><EmailBlastBuilder /></li>
+                    <li><Link to="/dashboard">Dashboard</Link></li>
                     <li><Link to="/">Return to index</Link></li>
                 </ul>
             </div>
