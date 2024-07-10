@@ -28,14 +28,6 @@ export default function EmailBlastBuilder() {
         }
     }
 
-    // const onSubmit = () => {
-    //     if (user) {
-    //         handleEmailBlastSubmit(name, body, user.id);
-    //     } else {
-    //         console.error("No user found");
-    //     }
-    // }
-
     function onFormSubmit() {
         if (!user) return;
         handleEmailBlastSubmit(name, body, user.id);

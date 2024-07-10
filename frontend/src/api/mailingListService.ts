@@ -148,6 +148,36 @@ export async function softDeleteMailingList(id: string, token: string) {
     }
 }
 
+// This function adds a new recipient
+export async function addNewRecipient(name: string, email: string, token: string) {
+    try {
+        const response = await fetch(SERVER_URL + "/recipient/new", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+                name: name,
+                email: email
+            }),
+        });
+        if (!response.ok) {
+            throw new Error(`Failed to add new recipient. Server responded with status: ${response.status}`);
+        }
+        const result = await response.json();
+        return result;
+    } catch (error) {
+        if (error instanceof Error) {
+            console.error("An error occurred while trying to add a new recipient:", error.message);
+            throw new Error(`Failed to add new recipient: ${error.message}`);
+        } else {
+            console.error("An unexpected error occurred:", error);
+            throw new Error("An unexpected error occurred while trying to add a new recipient");
+        }
+    }
+}
+
 // this function updates a mailing list with adding and removing recipients
 export async function updateMailingList(id: string, token: string, addedRecipients: string[], removedRecipients: string[]) {
     try {
