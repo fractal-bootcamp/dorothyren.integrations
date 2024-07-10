@@ -1,3 +1,34 @@
+Mailing List Endpoints:
+CRUD
+AdminUser:
+- create adminUser
+- delete adminUser?
+
+MailingList:
+- create MailingList
+- read MailingList
+- update MailingList
+- "delete" MailingList - essentially soft delete
+
+Recipient:
+- **create recipient (POST)
+- read recipient? (GET)
+- update recipient? (PUT)
+- delete recipient? (DELETE)
+
+Message:
+- create message (POST)
+- read message (GET)
+- update message (PUT)
+- delete message (DELETE)
+
+EmailBlast: name, body
+- create EmailBlast (POST)
+- read EmailBlast (GET)
+- update EmailBlast (PUT)
+- delete EmailBlast (DELETE)
+
+
 in src - create a folder called services
 - 1 - in services create a listservice.ts 
 - 2. also create a config.ts

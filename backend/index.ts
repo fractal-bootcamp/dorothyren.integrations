@@ -53,7 +53,33 @@ app.post('/sign-up', optionalAdminUser, async (req, res) => {
     }
 });
 
+
 //FOR THE MAILING LIST PAGE
+
+// Create route for GET endpoint to search for specific mailing list by name
+app.get('/mailinglist/search', async (req, res) => {
+    const  {nameofList}  = req.query; // Get the search query from the URL parameters
+    if (!nameofList || typeof nameofList !== 'string') {
+        return res.status(400).json({ error: 'Name query parameter is required and must be a string' });
+    }
+    try {
+        const mailingLists = await prisma.mailingList.findMany({
+            where: {
+                name: {
+                    contains: nameofList,
+                    mode: 'insensitive' //case-insensitive search
+                }
+            },
+            orderBy: {
+                createdAt: 'desc'
+            },
+        });
+        res.json(mailingLists);
+    } catch (error) {
+        console.error('Error searching for mailing list', error);
+        res.status(500).json({ error: 'An error occurred while searching for the mailing list' });
+    }
+});
 
 //create route to GET all mailing lists
 app.get('/mailinglist/all', async (req, res) => {
@@ -90,26 +116,16 @@ app.get('/mailinglist/:id', async (req, res) => {
     }
 })
 
-//create route to DELETE a mailing list
-app.delete('/mailinglist/:id', async (req, res) => {
-    try{
-        const deletedList = await prisma.mailingList.delete({
-            where: {
-                id: req.params.id
-            },
-        })
-        res.status(200).json({ message: 'Mailing list deleted successfully' , deletedList});
-    }
-    catch (error) {
-        console.error('Error deleting mailing list', error);
-        res.status(500).json({ error: 'An error occurred while deleting the mailing list' });
-    }
-})
-
 //create route to POST a new mailing list
-app.post('/mailinglist', async (req, res) => {
+app.post('/mailinglist/new', async (req, res) => {
     try{
-
+        const newMailingList = await prisma.mailingList.create({
+            data: {
+                name: req.body.name,
+                createdAt: new Date(),
+            },
+        });
+        res.status(201).json({"message": "Mailing list created successfully", newMailingList});
     }
     catch (error) {
         console.error('Error creating mailing list', error);
@@ -117,8 +133,27 @@ app.post('/mailinglist', async (req, res) => {
     }
 })
 
+//create route to DELETE/PUT a mailing list
+app.put('/mailinglist/:id/delete', async (req, res) => {
+    try{
+        const deletedList = await prisma.mailingList.update({
+            where: {
+                id: req.params.id
+            },
+            data: {
+                isDeleted: new Date() //setting the current time stamp
+            }
+        })
+        res.status(200).json({ message: 'Mailing list deleted' , deletedList});
+    }
+    catch (error) {
+        console.error('Error deleting mailing list', error);
+        res.status(500).json({ error: 'An error occurred while deleting the mailing list' });
+    }
+})
+
 //create route to PUT a mailing list with recipients and remove a list of recipients
-app.put('/mailinglist/:id', async (req, res) => {
+app.put('/mailinglist/:id/update', async (req, res) => {
     // body - addedRecipients, removedRecipients
     const { addedRecipients: addedRecipientIds, removedRecipients: removedRecipientIds } = req.body as { addedRecipients: string[], removedRecipients: string[] };
 
@@ -139,10 +174,25 @@ app.put('/mailinglist/:id', async (req, res) => {
             }
         }
     })
-
     return res.status(200).json({ message: 'Mailing list updated successfully' });
-
 })
+
+//create a route to add recipients
+app.post('/recipient/new', async (req, res) => {
+    try {
+        const newRecipient = await prisma.recipient.create({
+            data: {
+                name: req.body.name,
+                email: req.body.email,
+                // Add any other necessary fields
+            },
+        });
+        res.status(201).json({"message": "Recipient created successfully", newRecipient});
+    } catch (error) {
+        console.error('Error creating recipient', error);
+        res.status(500).json({ error: 'An error occurred while creating the recipient' });
+    }
+});
 
 //create route to POST an email blast 
 app.post('/blast/new', async (req, res) => {
@@ -169,7 +219,7 @@ app.post('/blast/new', async (req, res) => {
         });
         // Send successful response
         res.status(201).json({
-            message: 'Email blast successfullycreated',
+            message: 'Email blast successfully created',
             emailBlast
         });
 
