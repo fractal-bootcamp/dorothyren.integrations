@@ -103,6 +103,10 @@ app.get('/mailinglist/:id', async (req, res) => {
         const mailingList = await prisma.mailingList.findUnique({
             where: {
                 id: req.params.id
+            },
+            include: {
+                Recipients: true,
+                EmailBlasts: true
             }
         });
         if (!mailingList) {
@@ -184,7 +188,6 @@ app.post('/recipient/new', async (req, res) => {
             data: {
                 name: req.body.name,
                 email: req.body.email,
-                // Add any other necessary fields
             },
         });
         res.status(201).json({"message": "Recipient created successfully", newRecipient});

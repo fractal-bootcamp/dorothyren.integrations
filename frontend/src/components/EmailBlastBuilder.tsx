@@ -20,8 +20,8 @@ export default function EmailBlastBuilder() {
             return;
         }
         try {
-            const newEmail = await createEmailBlast(name, body, adminUserId, token);
-            console.log("new email blast:", newEmail);
+            const response = await createEmailBlast(name, body, adminUserId, token);
+            console.log("new email blast:", response);
         }
         catch (error) {
             console.error("Error creating email blast:", error);
