@@ -4,13 +4,13 @@ import { useAuth } from "@clerk/clerk-react";
 import { useState } from "react";
 import { addNewRecipient } from "../api/mailingListService";
 
-export default function MailingListBuilder() {
+export default function AddNewRecipient() {
     const { getToken } = useAuth();
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
 
 
-    const handleAddRecipient = async (name: string, email: string) => {
+    const handleAddRecipient = async (name: string, email: string, mailingListId: string) => {
         const token = await getToken();
 
         if (!token) {
@@ -18,7 +18,7 @@ export default function MailingListBuilder() {
             return;
         }
         try {
-            const response = await addNewRecipient(name, email, token);
+            const response = await addNewRecipient(name, email, mailingListId, token);
             console.log("new recipient created", response)
         }
         catch (error) {
