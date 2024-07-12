@@ -71,7 +71,7 @@ export async function searchMailingLists(
 
 type RequestConfig = Omit<RequestInit, "body"> & {
   token: string;
-  body?: Object;
+  body?: { [key: string]: any };
 };
 
 //generalized makeRequest function that can be used in any fetch request
@@ -82,6 +82,7 @@ const makeRequest = async <T>(
 ): Promise<T> => {
   let results;
 
+  console.log(url, config);
   const response = await fetch(SERVER_URL + url, {
     ...config,
     headers: {
@@ -111,7 +112,7 @@ export const createMailingList = (token: string, name: string) => {
   return makeRequest<MailingList | undefined>("/mailinglist/new", {
     method: "POST",
     token,
-    body: name,
+    body: { name: name },
   });
 };
 
