@@ -10,7 +10,7 @@ export default function AddNewRecipient() {
     const [email, setEmail] = useState('')
 
 
-    const handleAddRecipient = async (name: string, email: string, mailingListId: string) => {
+    const handleAddRecipient = async (name: string, email: string, mailingListId: string): Promise<void> => {
         const token = await getToken();
 
         if (!token) {
